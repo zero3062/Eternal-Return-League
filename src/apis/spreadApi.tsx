@@ -3,8 +3,8 @@ import axios from 'axios';
 
 const accessToken = localStorage.getItem('access_token');
 
-export const fetchData = async (sheet: string) => {
-  const url = `${spreadsheetApi}${spreadsheetDocId}/values/${sheet}?key=${spreadsheetApikey}`;
+export const getRound = async (sheet: string) => {
+  const url = `${spreadsheetApi}${spreadsheetDocId}/values/${sheet}!e3:az10?key=${spreadsheetApikey}`;
   try {
     const response = await axios.get(url);
     return response.data.values;
