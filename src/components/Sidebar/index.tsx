@@ -1,46 +1,94 @@
-import { useEffect, useState } from 'react';
-import { duplicateSheet, fetchSheetNm } from '../../apis/spreadApi';
-import Modal from '../Modal/Modal';
-import { Header, List, ListWrapper, Wrapper } from './style';
+import {
+  CheckImg,
+  DeleteImg,
+  EditImg,
+  Header,
+  List,
+  ListWrapper,
+  Wrapper,
+} from './style';
+import { SheetNmINF } from '../../types/types';
+import { deleteSheet, updateSheetProperties } from '../../apis/spreadApi';
+import { useState } from 'react';
 
 const Sidebar = ({
-  handleGetData,
+  sheets,
+  setSheets,
   setOpen,
+  handleGetSheetNm,
+  handleLeagueClick,
 }: {
-  handleGetData: (title: string) => void;
+  sheets: SheetNmINF[];
+  setSheets: React.Dispatch<React.SetStateAction<SheetNmINF[]>>;
   setOpen: (open: boolean) => void;
+  handleGetSheetNm: (index: number) => void;
+  handleLeagueClick: (title: string) => void;
 }) => {
-  const [sheets, setSheets] = useState<
-    { id: number; title: string; active: boolean }[]
-  >([]);
-  const [sheetNm, setSheetNm] = useState('');
+  const [editTitle, setEditTitle] = useState('');
 
-  const handleLeagueClick = (title: string) => {
+  const activeSheetsIndex = sheets.findIndex((sheet) => sheet.active);
+
+  const handleEdit = async (
+    e: React.MouseEvent<HTMLImageElement, MouseEvent>,
+    title: string
+  ) => {
+    e.stopPropagation();
     setSheets((preSheets) =>
       preSheets.map((item) => {
-        return { ...item, active: item.title === title };
-      }),
+        return { ...item, edit: item.title === title };
+      })
     );
-    handleGetData(title);
+    setEditTitle(title);
   };
 
-  const handleGetSheetNm = async () => {
-    const response = await fetchSheetNm();
-    setSheets(response);
-    handleLeagueClick(response[3].title);
+  const handleSave = async (
+    e: React.MouseEvent<HTMLImageElement, MouseEvent>,
+    id: number
+  ) => {
+    e.stopPropagation();
+
+    await updateSheetProperties(id, editTitle);
+    await handleGetSheetNm(activeSheetsIndex);
+    setEditTitle('');
   };
 
-  const handleCreateSheet = async (id: number) => {
-    await duplicateSheet(id, sheetNm, sheets.length);
-    handleGetSheetNm();
-    handleLeagueClick(sheetNm);
+  const handleDelete = async (
+    e: React.MouseEvent<HTMLImageElement, MouseEvent>,
+    id: number
+  ) => {
+    e.stopPropagation();
 
-    setSheetNm('');
+    await deleteSheet(id);
+    await handleGetSheetNm(activeSheetsIndex);
   };
 
-  useEffect(() => {
-    handleGetSheetNm();
-  }, []);
+  const handleImg = (sheet: SheetNmINF) => {
+    const { id, active, edit } = sheet;
+    if (active) {
+      if (edit) {
+        return (
+          <CheckImg
+            src="./images/check.png"
+            onClick={(e) => handleSave(e, id)}
+          />
+        );
+      }
+
+      return (
+        <EditImg
+          src="./images/edit.png"
+          onClick={(e) => handleEdit(e, sheet.title)}
+        />
+      );
+    }
+
+    return (
+      <DeleteImg
+        src="./images/delete.png"
+        onClick={(e) => handleDelete(e, sheet.id)}
+      />
+    );
+  };
 
   return (
     <Wrapper>
@@ -48,24 +96,22 @@ const Sidebar = ({
         <p>League Name</p>
         <img src="./images/plus.png" onClick={() => setOpen(true)} />
       </Header>
-      {/* <label>시트 이름</label>
-      <input
-        value={sheetNm}
-        onChange={(e) => setSheetNm(e.target.value)}
-        placeholder="시트 이름을 입력해주세요"
-      />
-      {sheets.slice(0, 3).map((sheet) => (
-        <button onClick={() => handleCreateSheet(sheet.id)}>
-          {sheet.title} 시트 추가
-        </button>
-      ))} */}
       <ListWrapper>
         {sheets.slice(3).map((sheet) => (
           <List
             onClick={() => handleLeagueClick(sheet.title)}
             active={sheet.active}
           >
-            {sheet.title}
+            {sheet.edit ? (
+              <input
+                value={editTitle}
+                onClick={(e) => e.stopPropagation()}
+                onChange={(e) => setEditTitle(e.target.value)}
+              />
+            ) : (
+              <p>{sheet.title}</p>
+            )}
+            {handleImg(sheet)}
           </List>
         ))}
       </ListWrapper>

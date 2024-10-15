@@ -4,7 +4,7 @@ const Modal = ({
   children,
   setOpen,
 }: {
-  children: any;
+  children: React.ReactNode;
   setOpen: (open: boolean) => void;
 }) => {
   return (

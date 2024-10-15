@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { fetchSheetNm } from '../../../apis/spreadApi';
+import { useState } from 'react';
+import { duplicateSheet } from '../../../apis/spreadApi';
 import Modal from '../Modal';
 import {
   Button,
@@ -9,41 +9,42 @@ import {
   Header,
   Input,
 } from './style';
+import { SheetNmINF } from '../../../types/types';
 
 const AddSheetModal = ({
   open,
   setOpen,
+  sheets,
+  handleGetSheetNm,
 }: {
   open: boolean;
   setOpen: (open: boolean) => void;
+  sheets: SheetNmINF[];
+  handleGetSheetNm: (index: number) => void;
 }) => {
-  const [options, setOptions] = useState<
-    { id: number; title: string; active: boolean }[]
-  >([]);
+  const [sheetId, setSheetId] = useState<number | null>(null);
+  const [sheetNm, setSheetNm] = useState('');
 
-  const handleGetSheetNm = async () => {
-    const response = await fetchSheetNm();
-    setOptions(
-      response.filter((option: any) => option.title.includes('Sample')),
-    );
-  };
-
-  const handleCheckOption = (id: number) => {
-    setOptions((preOptions) =>
-      preOptions.map((option: any) => {
-        return { ...option, active: option.id === id };
-      }),
-    );
-  };
+  const options = sheets.filter((item) => item.title.includes('Sample'));
 
   const handleClose = (open: boolean) => {
     setOpen(open);
-    handleCheckOption(0);
+    setSheetId(null);
+    setSheetNm('');
   };
 
-  useEffect(() => {
-    handleGetSheetNm();
-  }, []);
+  const handleCreateSheet = async () => {
+    if (sheets.findIndex((sheet) => sheet.title === sheetNm) !== -1) {
+      setSheetNm('');
+    }
+
+    if (sheetId !== null && sheetNm !== '') {
+      await duplicateSheet(sheetId, sheetNm, sheets.length);
+      await handleGetSheetNm(-1);
+
+      handleClose(false);
+    }
+  };
 
   if (!open) return null;
 
@@ -51,21 +52,26 @@ const AddSheetModal = ({
     <Modal setOpen={handleClose}>
       <Content>
         <Header>Create Sheet</Header>
-        <Input type="text" placeholder="Enter the Sheet Name..." />
+        <Input
+          type="text"
+          placeholder="Enter the Sheet Name..."
+          value={sheetNm}
+          onChange={(e) => setSheetNm(e.target.value)}
+        />
         <CheckboxGroup>
           {options.map((option) => (
             <Checkbox>
               <input
                 type="checkbox"
                 id={String(option.id)}
-                checked={option.active}
-                onChange={() => handleCheckOption(option.id)}
+                checked={option.id === sheetId}
+                onChange={() => setSheetId(option.id)}
               />
               <label htmlFor={String(option.id)}>{option.title}</label>
             </Checkbox>
           ))}
         </CheckboxGroup>
-        <Button>CONFIRM</Button>
+        <Button onClick={() => handleCreateSheet()}>CONFIRM</Button>
       </Content>
     </Modal>
   );
