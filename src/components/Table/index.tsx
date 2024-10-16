@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { getRoundData, getTeamData, getTotalData } from '../../apis/spreadApi';
+import {
+  getRoundData,
+  getTeamData,
+  getTotalData,
+  updateCellFormula,
+} from '../../apis/spreadApi';
 import useRange from '../../hooks/useRange';
 import { RoundINF, SheetNmINF } from '../../types/types';
 import { Wrapper } from './style';
@@ -15,7 +20,7 @@ const Table = ({ sheet, round }: { sheet?: SheetNmINF; round?: RoundINF }) => {
 
   const mergeData = (
     names: string[][],
-    scores: number[][],
+    scores: number[][]
   ): (string | number)[][] => {
     const result: (string | number)[][] = [];
 
@@ -68,6 +73,64 @@ const Table = ({ sheet, round }: { sheet?: SheetNmINF; round?: RoundINF }) => {
     }
   };
 
+  const getAlphabetGroup = (num: number) => {
+    const groupSize = 3; // 각 그룹의 크기
+
+    if (num < 1) return []; // 유효하지 않은 숫자
+
+    // 숫자에 따라 그룹의 시작 인덱스 계산
+    const startIndex = (num - 1) * groupSize;
+
+    // 그룹을 생성할 배열
+    let group = [];
+
+    for (let i = 0; i < groupSize; i++) {
+      group.push(convertToAlphabet(startIndex + i));
+    }
+
+    return group;
+  };
+
+  // 숫자를 알파벳으로 변환하는 함수
+  const convertToAlphabet = (index: number) => {
+    let result = '';
+    let currentIndex = index;
+
+    // 알파벳 변환 로직
+    while (currentIndex >= 0) {
+      let charCode = (currentIndex % 26) + 69; // 97은 'a'의 ASCII 코드
+      result = String.fromCharCode(charCode) + result; // 앞에 추가
+      currentIndex = Math.floor(currentIndex / 26) - 1; // 다음 인덱스 계산
+    }
+
+    return result;
+  };
+
+  const handleEdit = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    rowIndex: number,
+    index: number
+  ) => {
+    if (!sheet || !round) return;
+    const value =
+      index !== 0 ? e.target.value.replace(/[^0-9]/gim, '') : e.target.value;
+
+    setData((preData) =>
+      preData.map((row, rowIdx) =>
+        rowIdx === rowIndex
+          ? row.map((item, idx) => (idx === index ? value : item))
+          : row
+      )
+    );
+
+    const row = [
+      'A',
+      ...getAlphabetGroup(extractRoundNumber(round.title) ?? 0),
+    ];
+
+    await updateCellFormula(sheet.title, `${row[index]}${rowIndex + 3}`, value);
+  };
+
   useEffect(() => {
     setData([]);
     handleGetData();
@@ -98,11 +161,21 @@ const Table = ({ sheet, round }: { sheet?: SheetNmINF; round?: RoundINF }) => {
           )}
         </thead>
         <tbody>
-          {data.map((row: (string | number)[]) => (
+          {data.map((row: (string | number)[], rowIndex: number) => (
             <tr>
-              {row.map((item: string | number) => (
-                <td>{item}</td>
-              ))}
+              {row.map((item: string | number, index: number) =>
+                round.title === 'TOTAL' ? (
+                  <td>{item}</td>
+                ) : (
+                  <td>
+                    <input
+                      value={item}
+                      placeholder="-"
+                      onChange={(e) => handleEdit(e, rowIndex, index)}
+                    />
+                  </td>
+                )
+              )}
             </tr>
           ))}
         </tbody>

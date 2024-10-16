@@ -31,20 +31,20 @@ const Round = ({
     const range = getRangeByNumber(newRound);
     const values = [[`${newRound} Round`]];
 
-    await addRound(sheet, range, values);
+    await addRound(sheet, range, values, newRound);
     await handleGetRound(sheet.title);
   };
 
   const handleDelete = async (
     e: React.MouseEvent<HTMLImageElement, MouseEvent>,
-    index: number,
+    index: number
   ) => {
     e.stopPropagation();
     if (!sheet) return;
 
     const range = getRangeByNumber(index, true);
 
-    await deleteRound(sheet, range);
+    await deleteRound(sheet, range, index - 1);
     await handleGetRound(sheet.title);
   };
 
