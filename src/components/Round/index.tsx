@@ -14,23 +14,15 @@ import useRange from '../../hooks/useRange';
 const Round = ({
   sheet,
   rounds,
-  setRounds,
   handleGetRound,
+  handleRoundClick,
 }: {
   sheet?: SheetNmINF;
   rounds: RoundINF[];
-  setRounds: React.Dispatch<React.SetStateAction<RoundINF[]>>;
   handleGetRound: (title: string) => void;
+  handleRoundClick: (title: string) => void;
 }) => {
   const { getRangeByNumber } = useRange();
-
-  const handleRoundClick = (title: string) => {
-    setRounds((preRounds) =>
-      preRounds.map((item) => {
-        return { ...item, active: item.title === title };
-      }),
-    );
-  };
 
   const handleAddRound = async () => {
     if (!sheet) return;

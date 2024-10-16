@@ -278,3 +278,33 @@ export const deleteRound = async (sheet: SheetNmINF, range: string) => {
     console.error('Error deleting range:', error);
   }
 };
+
+export const getTotalData = async (sheet: string) => {
+  const url = `${spreadsheetApi}${spreadsheetDocId}/values/${sheet}!a14:d21?key=${spreadsheetApikey}`;
+  try {
+    const response = await axios.get(url);
+    return response.data.values ?? [];
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+};
+
+export const getTeamData = async (sheet: string) => {
+  const url = `${spreadsheetApi}${spreadsheetDocId}/values/${sheet}!A3:A10?key=${spreadsheetApikey}`;
+  try {
+    const response = await axios.get(url);
+    return response.data.values ?? [];
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+};
+
+export const getRoundData = async (sheet: string, range: string) => {
+  const url = `${spreadsheetApi}${spreadsheetDocId}/values/${sheet}!${range}?key=${spreadsheetApikey}`;
+  try {
+    const response = await axios.get(url);
+    return response.data.values ?? [];
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+};

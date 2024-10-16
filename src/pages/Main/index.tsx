@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { fetchSheetNm, getRound } from '../../apis/spreadApi';
-import {
-  Sidebar,
-  AddSheetModal,
-  Round,
-  TotalTable,
-  RoundTable,
-} from '../../components';
+import { Sidebar, AddSheetModal, Round, Table } from '../../components';
 import { Wrapper, Content } from './style';
 import { RoundINF, SheetNmINF } from '../../types/types';
 
@@ -15,14 +9,15 @@ const Main = () => {
   const [sheets, setSheets] = useState<SheetNmINF[]>([]);
   const [rounds, setRounds] = useState<RoundINF[]>([]);
 
-  const handleLeagueClick = (title: string) => {
+  const handleLeagueClick = async (title: string) => {
     setSheets((preSheets) =>
-      preSheets.map((item) => {
-        return { ...item, active: item.title === title, edit: false };
-      }),
+      preSheets.map((item) => ({
+        ...item,
+        active: item.title === title,
+        edit: false,
+      })),
     );
-    setRounds(() => []);
-    handleGetRound(title);
+    await handleGetRound(title);
   };
 
   const handleGetSheetNm = async (index: number) => {
@@ -32,22 +27,29 @@ const Main = () => {
     const select =
       index === -1 ? response[response.length - 1] : response[index];
 
-    handleLeagueClick(select.title);
+    await handleLeagueClick(select.title);
   };
 
   const handleGetRound = async (title: string) => {
     const response = await getRound(title);
     const roundCnt = Math.ceil(response[0].length / 3);
     setRounds([
-      {
-        title: 'TOTAL',
-        active: true,
-      },
+      { title: 'TOTAL', active: false },
       ...Array.from({ length: roundCnt }).map((_, index) => ({
         title: `ROUND ${index + 1}`,
         active: false,
       })),
     ]);
+
+    handleRoundClick('TOTAL');
+  };
+
+  const handleRoundClick = async (title: string) => {
+    setRounds((preRounds) =>
+      preRounds.map((item) => {
+        return { ...item, active: item.title === title };
+      }),
+    );
   };
 
   useEffect(() => {
@@ -67,17 +69,13 @@ const Main = () => {
         <Round
           sheet={sheets.find((sheet) => sheet.active)}
           rounds={rounds}
-          setRounds={setRounds}
           handleGetRound={handleGetRound}
+          handleRoundClick={handleRoundClick}
         />
-        {rounds.length !== 0 &&
-          rounds.filter((round) => round.active)[0].title === 'TOTAL' && (
-            <TotalTable />
-          )}
-        {rounds.length !== 0 &&
-          rounds.filter((round) => round.active)[0].title !== 'TOTAL' && (
-            <RoundTable />
-          )}
+        <Table
+          sheet={sheets.find((sheet) => sheet.active)}
+          round={rounds.find((round) => round.active)}
+        />
       </Content>
       <AddSheetModal
         open={open}
