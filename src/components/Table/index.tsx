@@ -69,10 +69,13 @@ const Table = ({ sheet, round }: { sheet?: SheetNmINF; round?: RoundINF }) => {
   };
 
   useEffect(() => {
+    setData([]);
     handleGetData();
   }, [sheet, round]);
 
   if (!sheet || !round) return null;
+
+  if (data.length === 0) return <Wrapper>Loading...</Wrapper>;
 
   return (
     <Wrapper>

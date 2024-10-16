@@ -17,6 +17,7 @@ const Main = () => {
         edit: false,
       })),
     );
+    setRounds([]);
     await handleGetRound(title);
   };
 
