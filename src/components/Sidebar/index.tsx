@@ -1,9 +1,11 @@
+import React from 'react';
 import {
   CheckImg,
   DeleteImg,
   EditImg,
   Header,
   List,
+  ListHeader,
   ListWrapper,
   Wrapper,
 } from './style';
@@ -30,20 +32,20 @@ const Sidebar = ({
 
   const handleEdit = async (
     e: React.MouseEvent<HTMLImageElement, MouseEvent>,
-    title: string
+    title: string,
   ) => {
     e.stopPropagation();
     setSheets((preSheets) =>
       preSheets.map((item) => {
         return { ...item, edit: item.title === title };
-      })
+      }),
     );
     setEditTitle(title);
   };
 
   const handleSave = async (
     e: React.MouseEvent<HTMLImageElement, MouseEvent>,
-    id: number
+    id: number,
   ) => {
     e.stopPropagation();
 
@@ -54,7 +56,7 @@ const Sidebar = ({
 
   const handleDelete = async (
     e: React.MouseEvent<HTMLImageElement, MouseEvent>,
-    id: number
+    id: number,
   ) => {
     e.stopPropagation();
 
@@ -102,16 +104,18 @@ const Sidebar = ({
             onClick={() => handleLeagueClick(sheet.title)}
             active={sheet.active}
           >
-            {sheet.edit ? (
-              <input
-                value={editTitle}
-                onClick={(e) => e.stopPropagation()}
-                onChange={(e) => setEditTitle(e.target.value)}
-              />
-            ) : (
-              <p>{sheet.title}</p>
-            )}
-            {handleImg(sheet)}
+            <ListHeader>
+              {sheet.edit ? (
+                <input
+                  value={editTitle}
+                  onClick={(e) => e.stopPropagation()}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                />
+              ) : (
+                <p>{sheet.title}</p>
+              )}
+              {handleImg(sheet)}
+            </ListHeader>
           </List>
         ))}
       </ListWrapper>

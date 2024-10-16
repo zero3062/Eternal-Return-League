@@ -22,6 +22,8 @@ export const fetchSheetNm = async () => {
       return {
         id: sheet.properties.sheetId,
         title: sheet.properties.title,
+        edit: false,
+        active: false,
       };
     });
     return sheetNames;
@@ -60,7 +62,7 @@ export const moveSheetToEnd = async (sheetId: number, sheetCnt: number) => {
 export const duplicateSheet = async (
   sheetId: number,
   sheetNm: string,
-  sheetCnt: number
+  sheetCnt: number,
 ) => {
   const url = `${spreadsheetApi}${spreadsheetDocId}:batchUpdate?key=${spreadsheetApikey}`;
   const headers = {
@@ -81,7 +83,7 @@ export const duplicateSheet = async (
     const response = await axios.post(url, requestBody, { headers });
     await moveSheetToEnd(
       response.data.replies[0].duplicateSheet.properties.sheetId,
-      sheetCnt
+      sheetCnt,
     );
   } catch (error) {
     console.error('Error duplicating sheet:', error);
@@ -106,7 +108,7 @@ export const deleteSheet = async (sheetId: number) => {
 
 export const updateSheetProperties = async (
   sheetId: number,
-  sheetNm: string
+  sheetNm: string,
 ) => {
   const url = `${spreadsheetApi}${spreadsheetDocId}:batchUpdate?key=${spreadsheetApikey}`;
   const headers = {

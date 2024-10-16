@@ -13,7 +13,7 @@ const Main = () => {
     setSheets((preSheets) =>
       preSheets.map((item) => {
         return { ...item, active: item.title === title, edit: false };
-      })
+      }),
     );
     handleGetData(title);
   };
@@ -57,7 +57,7 @@ const Main = () => {
                       <th key={index} colSpan={2}>
                         Round {index + 1}
                       </th>
-                    )
+                    ),
                   )}
                 </tr>
               </thead>

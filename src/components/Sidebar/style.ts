@@ -48,15 +48,22 @@ export const List = styled.li<{ active: boolean }>`
   padding: 10px;
   border-radius: 5px;
   display: flex;
-  align-items: center;
-  font-size: 15px;
-  justify-content: space-between;
+  flex-direction: column;
   background: ${(props) =>
     props.active ? 'rgba(255, 255, 255, 0.1)' : 'transparent'};
 
   &:last-child {
     margin-bottom: 0;
   }
+
+  
+`;
+
+export const ListHeader = styled.div`
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+  justify-content: space-between;
 
   input {
     background: transparent;
@@ -73,7 +80,7 @@ export const List = styled.li<{ active: boolean }>`
       brightness(108%) contrast(104%);
     width: 20px;
   }
-`;
+`
 
 export const CheckImg = styled.img`
   &:hover {

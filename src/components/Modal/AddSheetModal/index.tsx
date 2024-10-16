@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { duplicateSheet } from '../../../apis/spreadApi';
 import Modal from '../Modal';
 import {

@@ -1,3 +1,4 @@
+import React from 'react';
 import { Content, Wrapper } from './style';
 
 const Modal = ({
