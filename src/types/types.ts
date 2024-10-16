@@ -3,4 +3,10 @@ export interface SheetNmINF {
   title: string;
   active: boolean;
   edit: boolean;
+  isRoundAdd: boolean;
+}
+
+export interface RoundINF {
+  title: string;
+  active: boolean;
 }

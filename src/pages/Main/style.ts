@@ -13,7 +13,7 @@ export const Content = styled.div`
 `
     
 export const Table  = styled.div`
-    margin-left: 390px;
+    margin-left: 630px;
     overflow-x: scroll;
 
     th, tr, td, input {

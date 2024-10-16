@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { fetchSheetNm, getRound } from '../../apis/spreadApi';
-import { Sidebar, AddSheetModal } from '../../components';
+import { Sidebar, AddSheetModal, Round } from '../../components';
 import { Wrapper, Table, Content } from './style';
-import { SheetNmINF } from '../../types/types';
+import { RoundINF, SheetNmINF } from '../../types/types';
 
 const Main = () => {
   const [open, setOpen] = useState(false);
   const [sheets, setSheets] = useState<SheetNmINF[]>([]);
-  const [round, setRound] = useState<number[][]>([]);
+  const [rounds, setRounds] = useState<RoundINF[]>([]);
 
   const handleLeagueClick = (title: string) => {
     setSheets((preSheets) =>
@@ -15,7 +15,7 @@ const Main = () => {
         return { ...item, active: item.title === title, edit: false };
       }),
     );
-    handleGetData(title);
+    handleGetRound(title);
   };
 
   const handleGetSheetNm = async (index: number) => {
@@ -28,9 +28,19 @@ const Main = () => {
     handleLeagueClick(select.title);
   };
 
-  const handleGetData = async (title: string) => {
+  const handleGetRound = async (title: string) => {
     const response = await getRound(title);
-    setRound(response);
+    const roundCnt = Math.ceil(response[0].length / 2);
+    setRounds([
+      {
+        title: 'TOTAL',
+        active: true,
+      },
+      ...Array.from({ length: roundCnt }).map((_, index) => ({
+        title: `ROUND ${index + 1}`,
+        active: false,
+      })),
+    ]);
   };
 
   useEffect(() => {
@@ -47,7 +57,12 @@ const Main = () => {
           handleGetSheetNm={handleGetSheetNm}
           handleLeagueClick={handleLeagueClick}
         />
-        {round.length !== 0 && (
+        <Round
+          sheet={sheets.find((sheet) => sheet.active)}
+          rounds={rounds}
+          setRounds={setRounds}
+        />
+        {/* {round.length !== 0 && (
           <Table>
             <table>
               <thead>
@@ -74,7 +89,7 @@ const Main = () => {
               </tbody>
             </table>
           </Table>
-        )}
+        )} */}
       </Content>
       <AddSheetModal
         open={open}

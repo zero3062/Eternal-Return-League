@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { fetchAccessToken } from './apis/authApi';
 import { Login, Main } from './pages';
 

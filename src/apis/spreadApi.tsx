@@ -1,17 +1,33 @@
 import { spreadsheetApi, spreadsheetApikey, spreadsheetDocId } from '../config';
 import axios from 'axios';
-import { SheetsINF } from '../types/spread';
+import { SheetsINF, TabColorINF } from '../types/spread';
 
 const accessToken = localStorage.getItem('access_token');
 
 export const getRound = async (sheet: string) => {
-  const url = `${spreadsheetApi}${spreadsheetDocId}/values/${sheet}!e3:az10?key=${spreadsheetApikey}`;
+  const url = `${spreadsheetApi}${spreadsheetDocId}/values/${sheet}!e2:az2?key=${spreadsheetApikey}`;
   try {
     const response = await axios.get(url);
     return response.data.values ?? [];
   } catch (error) {
     console.error('Error fetching data:', error);
   }
+};
+
+const handleToHex = (tabColor: TabColorINF) => {
+  const { red, green, blue } = tabColor;
+  const to255 = (value: number) => Math.round(value * 255);
+
+  const toHex = (value: number) => {
+    const hex = value.toString(16);
+    return hex.length === 1 ? '0' + hex : hex;
+  };
+
+  const r = toHex(to255(red));
+  const g = toHex(to255(green));
+  const b = toHex(to255(blue));
+
+  return `#${r}${g}${b}`;
 };
 
 export const fetchSheetNm = async () => {
@@ -24,6 +40,7 @@ export const fetchSheetNm = async () => {
         title: sheet.properties.title,
         edit: false,
         active: false,
+        isRoundAdd: handleToHex(sheet.properties.tabColor) === '#d9ead3',
       };
     });
     return sheetNames;
