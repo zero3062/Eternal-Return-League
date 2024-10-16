@@ -1,6 +1,7 @@
 import { spreadsheetApi, spreadsheetApikey, spreadsheetDocId } from '../config';
 import axios from 'axios';
 import { SheetsINF, TabColorINF } from '../types/spread';
+import { SheetNmINF } from '../types/types';
 
 const accessToken = localStorage.getItem('access_token');
 
@@ -149,5 +150,131 @@ export const updateSheetProperties = async (
     await axios.post(url, requestBody, { headers });
   } catch (error) {
     console.error('Error duplicating sheet:', error);
+  }
+};
+
+const getRangeDetails = (range: string) => {
+  // 범위에서 셀 범위 추출
+  const regex = /([A-Z]+)(\d+):([A-Z]+)(\d+)/;
+  const matches = range.match(regex);
+
+  if (!matches) {
+    throw new Error('Invalid range format');
+  }
+
+  const startColumn = matches[1]; // 시작 열
+  const startRow = parseInt(matches[2]); // 시작 행 (문자에서 숫자로 변환)
+  const endColumn = matches[3]; // 종료 열
+  const endRow = parseInt(matches[4]); // 종료 행 (문자에서 숫자로 변환)
+
+  // 열 인덱스를 숫자로 변환 (A=0, B=1, ..., Z=25, AA=26 ...)
+  const getColumnIndex = (column: string) => {
+    let index = 0;
+    for (let i = 0; i < column.length; i++) {
+      index = index * 26 + (column.charCodeAt(i) - 65 + 1);
+    }
+    return index - 1; // 0-based index
+  };
+
+  // 각 범위 계산
+  const startColumnIndex = getColumnIndex(startColumn);
+  const endColumnIndex = getColumnIndex(endColumn) + 1; // 종료 열은 exclusive로 처리
+
+  return {
+    startRowIndex: startRow - 1, // 0부터 시작하도록 조정
+    endRowIndex: endRow, // 이미 exclusive 처리되므로 그대로 사용
+    startColumnIndex,
+    endColumnIndex,
+  };
+};
+
+const mergeCells = async (
+  sheetId: number, // 스프레드시트 ID
+  range: string,
+) => {
+  const url = `${spreadsheetApi}${spreadsheetDocId}:batchUpdate?key=${spreadsheetApikey}`;
+  const headers = {
+    Authorization: `Bearer ${accessToken}`, // OAuth 2.0 액세스 토큰
+  };
+  const requestBody = {
+    requests: [
+      {
+        mergeCells: {
+          range: {
+            sheetId: sheetId,
+            ...getRangeDetails(range),
+          },
+          mergeType: 'MERGE_ALL', // 셀 합치기 방식
+        },
+      },
+      {
+        repeatCell: {
+          range: {
+            sheetId: sheetId,
+            ...getRangeDetails(range),
+          },
+          cell: {
+            userEnteredFormat: {
+              horizontalAlignment: 'CENTER', // 가로 정렬을 가운데로 설정
+            },
+          },
+          fields: 'userEnteredFormat.horizontalAlignment', // 업데이트할 필드
+        },
+      },
+    ],
+  };
+
+  try {
+    await axios.post(url, requestBody, { headers });
+  } catch (error) {
+    console.error('Error merging cells:', error);
+  }
+};
+
+export const addRound = async (
+  sheet: SheetNmINF,
+  range: string,
+  values: number[][] | string[][],
+) => {
+  const url = `${spreadsheetApi}${spreadsheetDocId}/values/${sheet.title}!${range}:append?valueInputOption=USER_ENTERED&key=${spreadsheetApikey}`;
+  const headers = {
+    Authorization: `Bearer ${accessToken}`, // OAuth 2.0 액세스 토큰
+  };
+
+  const requestBody = {
+    values: values, // 추가할 데이터
+  };
+
+  try {
+    await axios.post(url, requestBody, { headers });
+    await mergeCells(sheet.id, range);
+  } catch (error) {
+    console.error('Error appending data to sheet:', error);
+  }
+};
+
+export const deleteRound = async (sheet: SheetNmINF, range: string) => {
+  const url = `${spreadsheetApi}${spreadsheetDocId}:batchUpdate?key=${spreadsheetApikey}`;
+  const headers = {
+    Authorization: `Bearer ${accessToken}`, // OAuth 2.0 액세스 토큰
+  };
+  const requestBody = {
+    requests: [
+      {
+        deleteRange: {
+          range: {
+            sheetId: sheet.id,
+            ...getRangeDetails(range),
+          },
+          shiftDimension: 'ROWS',
+        },
+      },
+    ],
+  };
+
+  try {
+    await axios.post(url, requestBody, { headers });
+  } catch (error) {
+    console.error('Error deleting range:', error);
   }
 };

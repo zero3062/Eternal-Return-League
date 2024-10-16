@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { fetchSheetNm, getRound } from '../../apis/spreadApi';
-import { Sidebar, AddSheetModal, Round } from '../../components';
-import { Wrapper, Table, Content } from './style';
+import {
+  Sidebar,
+  AddSheetModal,
+  Round,
+  TotalTable,
+  RoundTable,
+} from '../../components';
+import { Wrapper, Content } from './style';
 import { RoundINF, SheetNmINF } from '../../types/types';
 
 const Main = () => {
@@ -15,6 +21,7 @@ const Main = () => {
         return { ...item, active: item.title === title, edit: false };
       }),
     );
+    setRounds(() => []);
     handleGetRound(title);
   };
 
@@ -30,7 +37,7 @@ const Main = () => {
 
   const handleGetRound = async (title: string) => {
     const response = await getRound(title);
-    const roundCnt = Math.ceil(response[0].length / 2);
+    const roundCnt = Math.ceil(response[0].length / 3);
     setRounds([
       {
         title: 'TOTAL',
@@ -61,35 +68,16 @@ const Main = () => {
           sheet={sheets.find((sheet) => sheet.active)}
           rounds={rounds}
           setRounds={setRounds}
+          handleGetRound={handleGetRound}
         />
-        {/* {round.length !== 0 && (
-          <Table>
-            <table>
-              <thead>
-                <tr>
-                  {Array.from({ length: round[0].length / 2 }).map(
-                    (_, index) => (
-                      <th key={index} colSpan={2}>
-                        Round {index + 1}
-                      </th>
-                    ),
-                  )}
-                </tr>
-              </thead>
-              <tbody>
-                {round.map((row: number[], rowIndex) => (
-                  <tr key={rowIndex}>
-                    {row.map((cell: number, colIndex: number) => (
-                      <td key={colIndex}>
-                        <input readOnly type="text" value={cell || ''} />
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </Table>
-        )} */}
+        {rounds.length !== 0 &&
+          rounds.filter((round) => round.active)[0].title === 'TOTAL' && (
+            <TotalTable />
+          )}
+        {rounds.length !== 0 &&
+          rounds.filter((round) => round.active)[0].title !== 'TOTAL' && (
+            <RoundTable />
+          )}
       </Content>
       <AddSheetModal
         open={open}

@@ -56,8 +56,6 @@ export const List = styled.li<{ active: boolean }>`
   &:last-child {
     margin-bottom: 0;
   }
-
-  
 `;
 
 export const ListHeader = styled.div`
@@ -82,20 +80,6 @@ export const ListHeader = styled.div`
     width: 20px;
   }
 `
-
-export const CheckImg = styled.img`
-  &:hover {
-    filter: invert(38%) sepia(61%) saturate(1404%) hue-rotate(150deg)
-      brightness(96%) contrast(101%);
-  }
-`;
-
-export const EditImg = styled.img`
-  &:hover {
-    filter: invert(38%) sepia(61%) saturate(1404%) hue-rotate(150deg)
-      brightness(96%) contrast(101%);
-  }
-`;
 
 export const DeleteImg = styled.img`
   &:hover {

@@ -11,19 +11,3 @@ export const Content = styled.div`
     display: flex;
     height: 100%;
 `
-    
-export const Table  = styled.div`
-    margin-left: 630px;
-    overflow-x: scroll;
-
-    th, tr, td, input {
-        background: transparent;
-        color: white;
-    }
-
-    th, input {
-        border: 1px solid white;
-        padding:5px;
-        outline: none;
-    }
-`;
