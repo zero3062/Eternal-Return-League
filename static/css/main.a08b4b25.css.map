@@ -1,0 +1,1 @@
+{"version":3,"file":"static/css/main.a08b4b25.css","mappings":"AAAA,UACI,WACJ,CAEA,KAGI,kBAAyB,CAFzB,QAAS,CACT,SAGJ","sources":["index.css"],"sourcesContent":["html, body {\r\n    height: 100%;\r\n}\r\n\r\nbody {\r\n    margin: 0;\r\n    padding: 0;\r\n    background: rgb(49,51,56);\r\n\r\n}"],"names":[],"sourceRoot":""}
