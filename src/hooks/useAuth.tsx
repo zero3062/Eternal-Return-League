@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { OAuthClientId } from '../config';
 
 // const REDIRECT_URI = 'http://localhost:3000';
-const REDIRECT_URI = 'https://zero3062.github.io/Eternal-Return-League/';
+const REDIRECT_URI = 'https://zero3062.github.io/Eternal-Return-League';
 const SCOPE = 'https://www.googleapis.com/auth/spreadsheets';
 
 const useAuth = () => {
