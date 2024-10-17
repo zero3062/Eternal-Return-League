@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/Eternal-Return-League/static/css/main.a08b4b25.css",
-    "main.js": "/Eternal-Return-League/static/js/main.452f4bd6.js",
+    "main.js": "/Eternal-Return-League/static/js/main.b03505fc.js",
     "index.html": "/Eternal-Return-League/index.html",
     "main.a08b4b25.css.map": "/Eternal-Return-League/static/css/main.a08b4b25.css.map",
-    "main.452f4bd6.js.map": "/Eternal-Return-League/static/js/main.452f4bd6.js.map"
+    "main.b03505fc.js.map": "/Eternal-Return-League/static/js/main.b03505fc.js.map"
   },
   "entrypoints": [
     "static/css/main.a08b4b25.css",
-    "static/js/main.452f4bd6.js"
+    "static/js/main.b03505fc.js"
   ]
 }
