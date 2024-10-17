@@ -13,10 +13,12 @@ const Table = ({
   accessToken,
   sheet,
   round,
+  socket,
 }: {
   accessToken: string;
   sheet?: SheetNmINF;
   round?: RoundINF;
+  socket: any;
 }) => {
   const { getRoundRange } = useRange();
   const [data, setData] = useState<(string | number)[][]>([]);
@@ -72,6 +74,7 @@ const Table = ({
   };
 
   const handleGetData = async () => {
+    console.log('?');
     if (sheet && round) {
       if (round.title === 'TOTAL') {
         await handleTotalData(sheet.title);
@@ -137,6 +140,11 @@ const Table = ({
     ];
 
     await updateCellFormula(sheet.title, `${row[index]}${rowIndex + 3}`, value);
+    socket.emit('send_message', {
+      sheetId: sheet.id,
+      round: round.title,
+      type: 'data',
+    });
   };
 
   const handleCheckmate = (row: (number | string)[]) => {
@@ -148,6 +156,15 @@ const Table = ({
     setData([]);
     handleGetData();
   }, [sheet, round]);
+
+  useEffect(() => {
+    socket.on('receive_message', (data: any) => {
+      const { sheetId, round, type } = data;
+      if (sheetId === sheet?.id && round === round.title && type === 'data') {
+        handleGetData();
+      }
+    });
+  }, [socket]);
 
   if (!sheet || !round) return null;
 

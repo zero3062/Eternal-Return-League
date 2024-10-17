@@ -4,6 +4,9 @@ import { Sidebar, AddSheetModal, Round, Table } from '../../components';
 import { Wrapper, Content } from './style';
 import { RoundINF, SheetNmINF } from '../../types/types';
 import useAuth from '../../hooks/useAuth';
+import io from 'socket.io-client';
+
+const socket = io.connect('http://localhost:8080');
 
 const Main = () => {
   const [open, setOpen] = useState(false);
@@ -84,6 +87,7 @@ const Main = () => {
           accessToken={accessToken}
           sheet={sheets.find((sheet) => sheet.active)}
           round={rounds.find((round) => round.active)}
+          socket={socket}
         />
       </Content>
       <AddSheetModal

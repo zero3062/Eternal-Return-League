@@ -80,7 +80,7 @@ export const moveSheetToEnd = async (sheetId: number, sheetCnt: number) => {
 export const duplicateSheet = async (
   sheetId: number,
   sheetNm: string,
-  sheetCnt: number
+  sheetCnt: number,
 ) => {
   const url = `${spreadsheetApi}${spreadsheetDocId}:batchUpdate?key=${spreadsheetApikey}`;
   const headers = {
@@ -101,7 +101,7 @@ export const duplicateSheet = async (
     const response = await axios.post(url, requestBody, { headers });
     await moveSheetToEnd(
       response.data.replies[0].duplicateSheet.properties.sheetId,
-      sheetCnt
+      sheetCnt,
     );
   } catch (error) {
     console.error('Error duplicating sheet:', error);
@@ -126,7 +126,7 @@ export const deleteSheet = async (sheetId: number) => {
 
 export const updateSheetProperties = async (
   sheetId: number,
-  sheetNm: string
+  sheetNm: string,
 ) => {
   const url = `${spreadsheetApi}${spreadsheetDocId}:batchUpdate?key=${spreadsheetApikey}`;
   const headers = {
@@ -190,7 +190,7 @@ const getRangeDetails = (range: string) => {
 
 const mergeCells = async (
   sheetId: number, // 스프레드시트 ID
-  range: string
+  range: string,
 ) => {
   const url = `${spreadsheetApi}${spreadsheetDocId}:batchUpdate?key=${spreadsheetApikey}`;
   const headers = {
@@ -235,7 +235,7 @@ export const addRound = async (
   sheet: SheetNmINF,
   range: string,
   values: number[][] | string[][],
-  newRound: number
+  newRound: number,
 ) => {
   const url = `${spreadsheetApi}${spreadsheetDocId}/values/${sheet.title}!${range}:append?valueInputOption=USER_ENTERED&key=${spreadsheetApikey}`;
   const headers = {
@@ -258,7 +258,7 @@ export const addRound = async (
 export const deleteRound = async (
   sheet: SheetNmINF,
   range: string,
-  thisRound: number
+  thisRound: number,
 ) => {
   const url = `${spreadsheetApi}${spreadsheetDocId}:batchUpdate?key=${spreadsheetApikey}`;
   const headers = {
@@ -319,7 +319,7 @@ export const getRoundData = async (sheet: string, range: string) => {
 export const updateCellFormula = async (
   sheet: string,
   range: string, // 예: "A1"
-  formula: string // 예: "=SUM(E4,H4,K4,N4,Q4,T4,W4,Y4)"
+  formula: string, // 예: "=SUM(E4,H4,K4,N4,Q4,T4,W4,Y4)"
 ) => {
   const url = `${spreadsheetApi}${spreadsheetDocId}/values/${sheet}!${range}?valueInputOption=USER_ENTERED&key=${spreadsheetApikey}`;
   const headers = {
@@ -352,7 +352,7 @@ const handleFormula = async (sheet: string, newRound: number) => {
   const generateColumnNames = (start = 'E', step = 3, count: number) => {
     const startIndex = start.charCodeAt(0) - 65; // 'E'의 인덱스 (4)
     return Array.from({ length: count }, (_, i) =>
-      indexToColumn(startIndex + i * step)
+      indexToColumn(startIndex + i * step),
     );
   };
 
@@ -365,30 +365,30 @@ const handleFormula = async (sheet: string, newRound: number) => {
   updateCellFormula(
     sheet,
     'B3',
-    `=ARRAYFORMULA(IF(${totalKillExpression}, ${totalKillExpression}, 0))`
+    `=ARRAYFORMULA(IF(${totalKillExpression}, ${totalKillExpression}, 0))`,
   );
 
   const DeathNonPlayerColumn = generateColumnNames('G', 3, newRound); // 동적으로 열 생성
   const DeathNonPlayerExpression = DeathNonPlayerColumn.map(
-    (col) => `${col}3:${col}10`
+    (col) => `${col}3:${col}10`,
   ).join(' + ');
 
   updateCellFormula(
     sheet,
     'D3',
-    `=ARRAYFORMULA(IF(${DeathNonPlayerExpression}, ${DeathNonPlayerExpression}, 0))`
+    `=ARRAYFORMULA(IF(${DeathNonPlayerExpression}, ${DeathNonPlayerExpression}, 0))`,
   );
 
   const TotalPointColumn = generateColumnNames('F', 3, newRound); // 동적으로 열 생성
   const TotalPointExpression = TotalPointColumn.map(
     (col) =>
-      `SWITCH(${col}3:${col}10, 1, 8, 2, 5, 3, 4, 4, 3, 5, 2, 6, 1, 7, 0, 8, 0, 0)`
+      `SWITCH(${col}3:${col}10, 1, 8, 2, 5, 3, 4, 4, 3, 5, 2, 6, 1, 7, 0, 8, 0, 0)`,
   ).join(' + ');
 
   updateCellFormula(
     sheet,
     'C3',
-    `=ARRAYFORMULA(IF(B3:B10 + ${TotalPointExpression} - D3:D10, B3:B10 + ${TotalPointExpression} - D3:D10, 0))`
+    `=ARRAYFORMULA(IF(B3:B10 + ${TotalPointExpression} - D3:D10, B3:B10 + ${TotalPointExpression} - D3:D10, 0))`,
   );
 
   const RankColumn = generateColumnNames('F', 3, newRound); // 동적으로 열 생성
@@ -399,18 +399,18 @@ const handleFormula = async (sheet: string, newRound: number) => {
   updateCellFormula(
     sheet,
     'B14',
-    `=SORT(A3:A10, C3:C10, FALSE, B3:B10, FALSE, ${RankExpression})`
+    `=SORT(A3:A10, C3:C10, FALSE, B3:B10, FALSE, ${RankExpression})`,
   );
 
   updateCellFormula(
     sheet,
     'C14',
-    `=SORT(B3:B10, C3:C10, FALSE, B3:B10, FALSE, ${RankExpression})`
+    `=SORT(B3:B10, C3:C10, FALSE, B3:B10, FALSE, ${RankExpression})`,
   );
 
   updateCellFormula(
     sheet,
     'D14',
-    `=SORT(C3:C10, C3:C10, FALSE, B3:B10, FALSE, ${RankExpression})`
+    `=SORT(C3:C10, C3:C10, FALSE, B3:B10, FALSE, ${RankExpression})`,
   );
 };
