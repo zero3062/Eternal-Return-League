@@ -19,8 +19,8 @@ export const Wrapper = styled.div`
   }
 
   th {
-    background: rgb(28 73 139);
-    color: white;
+    background: white;
+    color: rgb(53,54,59);
   }
 
   input {
@@ -41,3 +41,21 @@ export const Wrapper = styled.div`
     width: 100px;
   }
 `;
+
+export const Tbody = styled.tbody<{total: boolean}>`
+  ${(props) => props.total && `
+    tr:nth-child(-n+5) {
+      background: rgb(109, 158, 235);
+    }
+
+    tr:nth-child(n+5):nth-child(-n+8) {
+      background: rgb(224, 102, 102);
+    }
+  `}
+`
+
+export const Tr = styled.tr<{isCheckmate: boolean}>`
+  ${(props) => props.isCheckmate && `
+    color: rgb(0, 255, 0);
+  `}
+`

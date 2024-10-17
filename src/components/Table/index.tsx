@@ -7,7 +7,7 @@ import {
 } from '../../apis/spreadApi';
 import useRange from '../../hooks/useRange';
 import { RoundINF, SheetNmINF } from '../../types/types';
-import { Wrapper } from './style';
+import { Tbody, Tr, Wrapper } from './style';
 
 const Table = ({ sheet, round }: { sheet?: SheetNmINF; round?: RoundINF }) => {
   const { getRoundRange } = useRange();
@@ -20,7 +20,7 @@ const Table = ({ sheet, round }: { sheet?: SheetNmINF; round?: RoundINF }) => {
 
   const mergeData = (
     names: string[][],
-    scores: number[][]
+    scores: number[][],
   ): (string | number)[][] => {
     const result: (string | number)[][] = [];
 
@@ -73,24 +73,6 @@ const Table = ({ sheet, round }: { sheet?: SheetNmINF; round?: RoundINF }) => {
     }
   };
 
-  const getAlphabetGroup = (num: number) => {
-    const groupSize = 3; // 각 그룹의 크기
-
-    if (num < 1) return []; // 유효하지 않은 숫자
-
-    // 숫자에 따라 그룹의 시작 인덱스 계산
-    const startIndex = (num - 1) * groupSize;
-
-    // 그룹을 생성할 배열
-    let group = [];
-
-    for (let i = 0; i < groupSize; i++) {
-      group.push(convertToAlphabet(startIndex + i));
-    }
-
-    return group;
-  };
-
   // 숫자를 알파벳으로 변환하는 함수
   const convertToAlphabet = (index: number) => {
     let result = '';
@@ -106,10 +88,28 @@ const Table = ({ sheet, round }: { sheet?: SheetNmINF; round?: RoundINF }) => {
     return result;
   };
 
+  const getAlphabetGroup = (num: number) => {
+    const groupSize = 3; // 각 그룹의 크기
+
+    if (num < 1) return []; // 유효하지 않은 숫자
+
+    // 숫자에 따라 그룹의 시작 인덱스 계산
+    const startIndex = (num - 1) * groupSize;
+
+    // 그룹을 생성할 배열
+    let group: string[] = [];
+
+    for (let i = 0; i < groupSize; i++) {
+      group.push(convertToAlphabet(startIndex + i));
+    }
+
+    return group;
+  };
+
   const handleEdit = async (
     e: React.ChangeEvent<HTMLInputElement>,
     rowIndex: number,
-    index: number
+    index: number,
   ) => {
     if (!sheet || !round) return;
     const value =
@@ -119,8 +119,8 @@ const Table = ({ sheet, round }: { sheet?: SheetNmINF; round?: RoundINF }) => {
       preData.map((row, rowIdx) =>
         rowIdx === rowIndex
           ? row.map((item, idx) => (idx === index ? value : item))
-          : row
-      )
+          : row,
+      ),
     );
 
     const row = [
@@ -129,6 +129,11 @@ const Table = ({ sheet, round }: { sheet?: SheetNmINF; round?: RoundINF }) => {
     ];
 
     await updateCellFormula(sheet.title, `${row[index]}${rowIndex + 3}`, value);
+  };
+
+  const handleCheckmate = (row: (number | string)[]) => {
+    if (!sheet) return false;
+    return sheet?.isRoundAdd && Number(row[3]) > 55;
   };
 
   useEffect(() => {
@@ -160,9 +165,9 @@ const Table = ({ sheet, round }: { sheet?: SheetNmINF; round?: RoundINF }) => {
             </tr>
           )}
         </thead>
-        <tbody>
+        <Tbody total={round.title === 'TOTAL'}>
           {data.map((row: (string | number)[], rowIndex: number) => (
-            <tr>
+            <Tr isCheckmate={handleCheckmate(row)}>
               {row.map((item: string | number, index: number) =>
                 round.title === 'TOTAL' ? (
                   <td>{item}</td>
@@ -174,11 +179,11 @@ const Table = ({ sheet, round }: { sheet?: SheetNmINF; round?: RoundINF }) => {
                       onChange={(e) => handleEdit(e, rowIndex, index)}
                     />
                   </td>
-                )
+                ),
               )}
-            </tr>
+            </Tr>
           ))}
-        </tbody>
+        </Tbody>
       </table>
     </Wrapper>
   );
