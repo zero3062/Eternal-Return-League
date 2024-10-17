@@ -4,10 +4,16 @@ export const Wrapper = styled.div`
   position: fixed;
   height: 100%;
   width: 350px;
-  padding: 20px;
   color: white;
   background: rgb(43, 45, 49);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between
 `;
+
+export const Content = styled.div`
+  padding: 20px;
+`
 
 export const Header = styled.div`
   display: flex;
@@ -36,7 +42,7 @@ export const Header = styled.div`
 `;
 
 export const ListWrapper = styled.ul`
-  height: 93%;
+  height: 90%;
   overflow-y: scroll;
   list-style-type: none;
   padding-left: 0;
@@ -55,8 +61,6 @@ export const List = styled.li<{ active: boolean }>`
   &:last-child {
     margin-bottom: 0;
   }
-
-  
 `;
 
 export const ListHeader = styled.div`
@@ -102,3 +106,18 @@ export const DeleteImg = styled.img`
       brightness(106%) contrast(117%);
   }
 `;
+
+export const User = styled.div`
+  padding: 20px;
+  background: rgb(40,41,44);
+
+  button {
+    background: rgb(51,52,55);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 20px;
+    cursor: pointer;
+  }
+`

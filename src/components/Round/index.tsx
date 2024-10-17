@@ -12,11 +12,13 @@ import { addRound, deleteRound } from '../../apis/spreadApi';
 import useRange from '../../hooks/useRange';
 
 const Round = ({
+  accessToken,
   sheet,
   rounds,
   handleGetRound,
   handleRoundClick,
 }: {
+  accessToken: string;
   sheet?: SheetNmINF;
   rounds: RoundINF[];
   handleGetRound: (title: string) => void;
@@ -37,7 +39,7 @@ const Round = ({
 
   const handleDelete = async (
     e: React.MouseEvent<HTMLImageElement, MouseEvent>,
-    index: number
+    index: number,
   ) => {
     e.stopPropagation();
     if (!sheet) return;
@@ -54,7 +56,7 @@ const Round = ({
     <Wrapper>
       <Header>
         <p>Round</p>
-        {sheet.isRoundAdd && rounds.length !== 0 && (
+        {accessToken && sheet.isRoundAdd && rounds.length !== 0 && (
           <img
             src="./images/plus.png"
             onClick={() => {
@@ -73,7 +75,8 @@ const Round = ({
             >
               <ListHeader>
                 <p>{round.title}</p>
-                {sheet.isRoundAdd &&
+                {accessToken &&
+                  sheet.isRoundAdd &&
                   !round.active &&
                   index > 4 &&
                   index === rounds.length - 1 && (

@@ -3,11 +3,14 @@ import { fetchSheetNm, getRound } from '../../apis/spreadApi';
 import { Sidebar, AddSheetModal, Round, Table } from '../../components';
 import { Wrapper, Content } from './style';
 import { RoundINF, SheetNmINF } from '../../types/types';
+import useAuth from '../../hooks/useAuth';
 
 const Main = () => {
   const [open, setOpen] = useState(false);
   const [sheets, setSheets] = useState<SheetNmINF[]>([]);
   const [rounds, setRounds] = useState<RoundINF[]>([]);
+
+  const { accessToken, handleLogOut, handleLogin } = useAuth();
 
   const handleLeagueClick = async (title: string) => {
     setSheets((preSheets) =>
@@ -61,6 +64,9 @@ const Main = () => {
     <Wrapper>
       <Content>
         <Sidebar
+          accessToken={accessToken}
+          handleLogOut={handleLogOut}
+          handleLogin={handleLogin}
           sheets={sheets}
           setSheets={setSheets}
           setOpen={setOpen}
@@ -68,12 +74,14 @@ const Main = () => {
           handleLeagueClick={handleLeagueClick}
         />
         <Round
+          accessToken={accessToken}
           sheet={sheets.find((sheet) => sheet.active)}
           rounds={rounds}
           handleGetRound={handleGetRound}
           handleRoundClick={handleRoundClick}
         />
         <Table
+          accessToken={accessToken}
           sheet={sheets.find((sheet) => sheet.active)}
           round={rounds.find((round) => round.active)}
         />

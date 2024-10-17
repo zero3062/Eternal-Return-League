@@ -1,7 +1,7 @@
 import { styled } from 'styled-components';
 
 export const Wrapper = styled.div`
-  margin-left: 630px;
+  margin-left: 590px;
   overflow-x: scroll;
   padding: 20px;
   color: white;

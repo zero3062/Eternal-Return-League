@@ -9,7 +9,15 @@ import useRange from '../../hooks/useRange';
 import { RoundINF, SheetNmINF } from '../../types/types';
 import { Tbody, Tr, Wrapper } from './style';
 
-const Table = ({ sheet, round }: { sheet?: SheetNmINF; round?: RoundINF }) => {
+const Table = ({
+  accessToken,
+  sheet,
+  round,
+}: {
+  accessToken: string;
+  sheet?: SheetNmINF;
+  round?: RoundINF;
+}) => {
   const { getRoundRange } = useRange();
   const [data, setData] = useState<(string | number)[][]>([]);
 
@@ -169,7 +177,7 @@ const Table = ({ sheet, round }: { sheet?: SheetNmINF; round?: RoundINF }) => {
           {data.map((row: (string | number)[], rowIndex: number) => (
             <Tr isCheckmate={handleCheckmate(row)}>
               {row.map((item: string | number, index: number) =>
-                round.title === 'TOTAL' ? (
+                !accessToken || round.title === 'TOTAL' ? (
                   <td>{item}</td>
                 ) : (
                   <td>
