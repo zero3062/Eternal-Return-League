@@ -30,7 +30,7 @@ const Table = ({
 
   const mergeData = (
     names: string[][],
-    scores: number[][],
+    scores: number[][]
   ): (string | number)[][] => {
     const result: (string | number)[][] = [];
 
@@ -74,7 +74,6 @@ const Table = ({
   };
 
   const handleGetData = async () => {
-    console.log('?');
     if (sheet && round) {
       if (round.title === 'TOTAL') {
         await handleTotalData(sheet.title);
@@ -120,7 +119,7 @@ const Table = ({
   const handleEdit = async (
     e: React.ChangeEvent<HTMLInputElement>,
     rowIndex: number,
-    index: number,
+    index: number
   ) => {
     if (!sheet || !round) return;
     const value =
@@ -130,8 +129,8 @@ const Table = ({
       preData.map((row, rowIdx) =>
         rowIdx === rowIndex
           ? row.map((item, idx) => (idx === index ? value : item))
-          : row,
-      ),
+          : row
+      )
     );
 
     const row = [
@@ -142,7 +141,7 @@ const Table = ({
     await updateCellFormula(sheet.title, `${row[index]}${rowIndex + 3}`, value);
     socket.emit('send_message', {
       sheetId: sheet.id,
-      round: round.title,
+      roundTitle: round.title,
       type: 'data',
     });
   };
@@ -158,13 +157,19 @@ const Table = ({
   }, [sheet, round]);
 
   useEffect(() => {
-    socket.on('receive_message', (data: any) => {
-      const { sheetId, round, type } = data;
-      if (sheetId === sheet?.id && round === round.title && type === 'data') {
-        handleGetData();
-      }
-    });
-  }, [socket]);
+    if (sheet && round) {
+      socket.on('receive_message', (data: any) => {
+        const { sheetId, roundTitle, type } = data;
+        if (
+          sheetId === sheet?.id &&
+          roundTitle === round?.title &&
+          type === 'data'
+        ) {
+          handleGetData();
+        }
+      });
+    }
+  }, [socket, sheet, round]);
 
   if (!sheet || !round) return null;
 
@@ -204,7 +209,7 @@ const Table = ({
                       onChange={(e) => handleEdit(e, rowIndex, index)}
                     />
                   </td>
-                ),
+                )
               )}
             </Tr>
           ))}

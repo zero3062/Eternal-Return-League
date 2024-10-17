@@ -6,8 +6,8 @@ import { RoundINF, SheetNmINF } from '../../types/types';
 import useAuth from '../../hooks/useAuth';
 import io from 'socket.io-client';
 
-// const socket = io.connect('http://localhost:8080');
-const socket = io.connect('https://eternal-return-league-server.vercel.app/');
+const socket = io.connect('http://localhost:8080');
+// const socket = io.connect('https://eternal-return-league-server.vercel.app/');
 
 const Main = () => {
   const [open, setOpen] = useState(false);
@@ -22,7 +22,7 @@ const Main = () => {
         ...item,
         active: item.title === title,
         edit: false,
-      })),
+      }))
     );
     setRounds([]);
     await handleGetRound(title);
@@ -56,7 +56,7 @@ const Main = () => {
     setRounds((preRounds) =>
       preRounds.map((item) => {
         return { ...item, active: item.title === title };
-      }),
+      })
     );
   };
 
