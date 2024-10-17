@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { OAuthClientId } from '../config';
 
-const TEST_REDIRECT_URI = 'http://localhost:3000';
-// const REDIRECT_URI = 'https://zero3062.github.io/Eternal-Return-League/';
+// const REDIRECT_URI = 'http://localhost:3000';
+const REDIRECT_URI = 'https://zero3062.github.io/Eternal-Return-League/';
 const SCOPE = 'https://www.googleapis.com/auth/spreadsheets';
 
 const useAuth = () => {
@@ -14,7 +14,7 @@ const useAuth = () => {
   };
 
   const handleLogin = () => {
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${OAuthClientId}&redirect_uri=${TEST_REDIRECT_URI}&response_type=token&scope=${SCOPE}`;
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${OAuthClientId}&redirect_uri=${REDIRECT_URI}&response_type=token&scope=${SCOPE}`;
     window.location.href = authUrl;
   };
 
