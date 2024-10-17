@@ -6,7 +6,8 @@ import { RoundINF, SheetNmINF } from '../../types/types';
 import useAuth from '../../hooks/useAuth';
 import io from 'socket.io-client';
 
-const socket = io.connect('http://localhost:8080');
+// const socket = io.connect('http://localhost:8080');
+const socket = io.connect('https://eternal-return-league-server.vercel.app/');
 
 const Main = () => {
   const [open, setOpen] = useState(false);
