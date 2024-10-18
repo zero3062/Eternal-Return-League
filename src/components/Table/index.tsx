@@ -158,14 +158,6 @@ const Table = ({
 
   useEffect(() => {
     if (sheet && round) {
-      socket.on('connect', () => {
-        console.log('Connected to server:', socket.id);
-      });
-
-      socket.on('disconnect', (reason: any) => {
-        console.log('Disconnected from server:', reason);
-      });
-
       socket.on('receive_message', (data: any) => {
         const { sheetId, roundTitle, type } = data;
         if (

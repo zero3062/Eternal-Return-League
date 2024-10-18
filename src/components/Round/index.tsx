@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   DeleteImg,
   Header,
@@ -17,12 +17,14 @@ const Round = ({
   rounds,
   handleGetRound,
   handleRoundClick,
+  socket,
 }: {
   accessToken: string;
   sheet?: SheetNmINF;
   rounds: RoundINF[];
-  handleGetRound: (title: string) => void;
+  handleGetRound: (title: string, round?: string) => void;
   handleRoundClick: (title: string) => void;
+  socket: any;
 }) => {
   const { getRangeByNumber } = useRange();
 
@@ -33,8 +35,17 @@ const Round = ({
     const range = getRangeByNumber(newRound);
     const values = [[`${newRound} Round`]];
 
+    const activeRound = rounds.find((round) => round.active);
+
     await addRound(sheet, range, values, newRound);
-    await handleGetRound(sheet.title);
+    await handleGetRound(
+      sheet.title,
+      activeRound ? activeRound.title : 'TOTAL',
+    );
+    socket.emit('send_message', {
+      sheetId: sheet.id,
+      type: 'addRound',
+    });
   };
 
   const handleDelete = async (
@@ -46,9 +57,40 @@ const Round = ({
 
     const range = getRangeByNumber(index, true);
 
+    const activeRound = rounds.find((round) => round.active);
+
     await deleteRound(sheet, range, index - 1);
-    await handleGetRound(sheet.title);
+    await handleGetRound(
+      sheet.title,
+      activeRound ? activeRound.title : 'TOTAL',
+    );
+    socket.emit('send_message', {
+      sheetId: sheet.id,
+      roundTitle: `ROUND ${index}`,
+      type: 'deleteRound',
+    });
   };
+
+  useEffect(() => {
+    if (sheet) {
+      socket.on('receive_message', (data: any) => {
+        const activeRound = rounds.find((round) => round.active);
+        const { sheetId, roundTitle, type } = data;
+        if (sheetId === sheet?.id && activeRound) {
+          if (type === 'deleteRound') {
+            handleGetRound(
+              sheet.title,
+              activeRound.title === roundTitle ? 'TOTAL' : activeRound.title,
+            );
+          }
+
+          if (type === 'addRound') {
+            handleGetRound(sheet.title, activeRound.title);
+          }
+        }
+      });
+    }
+  }, [socket, sheet, rounds]);
 
   if (!sheet) return null;
 

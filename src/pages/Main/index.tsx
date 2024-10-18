@@ -36,10 +36,12 @@ const Main = () => {
     const select =
       index === -1 ? response[response.length - 1] : response[index];
 
+    console.log(select.title);
+
     await handleLeagueClick(select.title);
   };
 
-  const handleGetRound = async (title: string) => {
+  const handleGetRound = async (title: string, round?: string) => {
     const response = await getRound(title);
     const roundCnt = Math.ceil(response[0].length / 3);
     setRounds([
@@ -50,7 +52,7 @@ const Main = () => {
       })),
     ]);
 
-    handleRoundClick('TOTAL');
+    handleRoundClick(round ?? 'TOTAL');
   };
 
   const handleRoundClick = async (title: string) => {
@@ -84,6 +86,7 @@ const Main = () => {
           rounds={rounds}
           handleGetRound={handleGetRound}
           handleRoundClick={handleRoundClick}
+          socket={socket}
         />
         <Table
           accessToken={accessToken}
