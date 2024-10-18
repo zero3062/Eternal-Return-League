@@ -30,7 +30,7 @@ const Table = ({
 
   const mergeData = (
     names: string[][],
-    scores: number[][]
+    scores: number[][],
   ): (string | number)[][] => {
     const result: (string | number)[][] = [];
 
@@ -119,7 +119,7 @@ const Table = ({
   const handleEdit = async (
     e: React.ChangeEvent<HTMLInputElement>,
     rowIndex: number,
-    index: number
+    index: number,
   ) => {
     if (!sheet || !round) return;
     const value =
@@ -129,8 +129,8 @@ const Table = ({
       preData.map((row, rowIdx) =>
         rowIdx === rowIndex
           ? row.map((item, idx) => (idx === index ? value : item))
-          : row
-      )
+          : row,
+      ),
     );
 
     const row = [
@@ -158,6 +158,14 @@ const Table = ({
 
   useEffect(() => {
     if (sheet && round) {
+      socket.on('connect', () => {
+        console.log('Connected to server:', socket.id);
+      });
+
+      socket.on('disconnect', (reason: any) => {
+        console.log('Disconnected from server:', reason);
+      });
+
       socket.on('receive_message', (data: any) => {
         const { sheetId, roundTitle, type } = data;
         if (
@@ -209,7 +217,7 @@ const Table = ({
                       onChange={(e) => handleEdit(e, rowIndex, index)}
                     />
                   </td>
-                )
+                ),
               )}
             </Tr>
           ))}
