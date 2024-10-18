@@ -8,28 +8,28 @@ import {
   Wrapper,
 } from './style';
 import { RoundINF, SheetNmINF } from '../../types/types';
-import { addRound, deleteRound } from '../../apis/spreadApi';
+import { addRound, deleteRound } from '../../api/apis/spreadApi';
 import useRange from '../../hooks/useRange';
 
 const Round = ({
   accessToken,
-  sheet,
+  sheetInfo,
   rounds,
   handleGetRound,
   handleRoundClick,
   socket,
 }: {
   accessToken: string;
-  sheet?: SheetNmINF;
+  sheetInfo: SheetNmINF;
   rounds: RoundINF[];
-  handleGetRound: (title: string, round?: string) => void;
+  handleGetRound: (round?: string) => void;
   handleRoundClick: (title: string) => void;
   socket: any;
 }) => {
   const { getRangeByNumber } = useRange();
 
   const handleAddRound = async () => {
-    if (!sheet) return;
+    if (!sheetInfo) return;
 
     const newRound = rounds.length;
     const range = getRangeByNumber(newRound);
@@ -37,13 +37,10 @@ const Round = ({
 
     const activeRound = rounds.find((round) => round.active);
 
-    await addRound(sheet, range, values, newRound);
-    await handleGetRound(
-      sheet.title,
-      activeRound ? activeRound.title : 'TOTAL',
-    );
+    await addRound(sheetInfo, range, values, newRound);
+    await handleGetRound(activeRound ? activeRound.title : 'TOTAL');
     socket.emit('send_message', {
-      sheetId: sheet.id,
+      sheetId: sheetInfo.id,
       type: 'addRound',
     });
   };
@@ -53,52 +50,48 @@ const Round = ({
     index: number,
   ) => {
     e.stopPropagation();
-    if (!sheet) return;
+    if (!sheetInfo) return;
 
     const range = getRangeByNumber(index, true);
 
     const activeRound = rounds.find((round) => round.active);
 
-    await deleteRound(sheet, range, index - 1);
-    await handleGetRound(
-      sheet.title,
-      activeRound ? activeRound.title : 'TOTAL',
-    );
+    await deleteRound(sheetInfo, range, index - 1);
+    await handleGetRound(activeRound ? activeRound.title : 'TOTAL');
     socket.emit('send_message', {
-      sheetId: sheet.id,
+      sheetId: sheetInfo.id,
       roundTitle: `ROUND ${index}`,
       type: 'deleteRound',
     });
   };
 
   useEffect(() => {
-    if (sheet) {
+    if (sheetInfo) {
       socket.on('receive_message', (data: any) => {
         const activeRound = rounds.find((round) => round.active);
         const { sheetId, roundTitle, type } = data;
-        if (sheetId === sheet?.id && activeRound) {
+        if (sheetId === sheetInfo?.id && activeRound) {
           if (type === 'deleteRound') {
             handleGetRound(
-              sheet.title,
               activeRound.title === roundTitle ? 'TOTAL' : activeRound.title,
             );
           }
 
           if (type === 'addRound') {
-            handleGetRound(sheet.title, activeRound.title);
+            handleGetRound(activeRound.title);
           }
         }
       });
     }
-  }, [socket, sheet, rounds]);
+  }, [socket, sheetInfo, rounds]);
 
-  if (!sheet) return null;
+  if (!sheetInfo) return null;
 
   return (
     <Wrapper>
       <Header>
         <p>Round</p>
-        {accessToken && sheet.isRoundAdd && rounds.length !== 0 && (
+        {accessToken && sheetInfo.isRoundAdd && rounds.length !== 0 && (
           <img
             src="./images/plus.png"
             onClick={() => {
@@ -118,7 +111,7 @@ const Round = ({
               <ListHeader>
                 <p>{round.title}</p>
                 {accessToken &&
-                  sheet.isRoundAdd &&
+                  sheetInfo.isRoundAdd &&
                   !round.active &&
                   index > 4 &&
                   index === rounds.length - 1 && (

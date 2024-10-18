@@ -11,3 +11,10 @@ export const Content = styled.div`
     display: flex;
     height: 100%;
 `
+export const Welcome = styled.div`
+    margin-top: 0;
+    margin-left: 350px;
+    padding: 20px;
+    color: white;
+    font-size: 20px;
+`

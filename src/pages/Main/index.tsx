@@ -1,58 +1,50 @@
 import React, { useEffect, useState } from 'react';
-import { fetchSheetNm, getRound } from '../../apis/spreadApi';
+import { useParams } from 'react-router-dom';
+import { getRound } from '../../api/apis/spreadApi';
 import { Sidebar, AddSheetModal, Round, Table } from '../../components';
-import { Wrapper, Content } from './style';
-import { RoundINF, SheetNmINF } from '../../types/types';
+import { Wrapper, Content, Welcome } from './style';
+import { RoundINF } from '../../types/types';
 import useAuth from '../../hooks/useAuth';
 import io from 'socket.io-client';
+import useSidebar from '../../hooks/useSidbar';
 
 // const socket = io.connect('http://localhost:8080');
 
 const socket = io.connect('https://eternal-return-league-server.onrender.com/');
 
 const Main = () => {
-  const [open, setOpen] = useState(false);
-  const [sheets, setSheets] = useState<SheetNmINF[]>([]);
-  const [rounds, setRounds] = useState<RoundINF[]>([]);
-
+  const { sheetId, round } = useParams();
   const { accessToken, handleLogOut, handleLogin } = useAuth();
 
-  const handleLeagueClick = async (title: string) => {
-    setSheets((preSheets) =>
-      preSheets.map((item) => ({
-        ...item,
-        active: item.title === title,
-        edit: false,
-      })),
-    );
-    setRounds([]);
-    await handleGetRound(title);
-  };
+  const {
+    sheets,
+    sheetInfo,
+    sheetNm,
+    setSheetNm,
+    handleGetSheets,
+    handleSelectSheet,
+    handleSheetEdit,
+    handleSheetNmSave,
+    handleSheetDelete,
+  } = useSidebar();
 
-  const handleGetSheetNm = async (index: number) => {
-    const response = await fetchSheetNm();
-    setSheets(response);
+  const [open, setOpen] = useState(false);
+  const [rounds, setRounds] = useState<RoundINF[]>([]);
 
-    const select =
-      index === -1 ? response[response.length - 1] : response[index];
+  const handleGetRound = async (round?: string) => {
+    if (sheetInfo) {
+      const response = await getRound(sheetInfo.title);
+      const roundCnt = Math.ceil(response[0].length / 3);
+      setRounds([
+        { title: 'TOTAL', active: false },
+        ...Array.from({ length: roundCnt }).map((_, index) => ({
+          title: `ROUND ${index + 1}`,
+          active: false,
+        })),
+      ]);
 
-    console.log(select.title);
-
-    await handleLeagueClick(select.title);
-  };
-
-  const handleGetRound = async (title: string, round?: string) => {
-    const response = await getRound(title);
-    const roundCnt = Math.ceil(response[0].length / 3);
-    setRounds([
-      { title: 'TOTAL', active: false },
-      ...Array.from({ length: roundCnt }).map((_, index) => ({
-        title: `ROUND ${index + 1}`,
-        active: false,
-      })),
-    ]);
-
-    handleRoundClick(round ?? 'TOTAL');
+      handleRoundClick(round ?? 'TOTAL');
+    }
   };
 
   const handleRoundClick = async (title: string) => {
@@ -64,43 +56,56 @@ const Main = () => {
   };
 
   useEffect(() => {
-    handleGetSheetNm(3);
-  }, []);
+    if (sheetId) {
+      setRounds([]);
+      handleGetRound();
+    }
+  }, [sheetId]);
 
   return (
     <Wrapper>
       <Content>
         <Sidebar
-          accessToken={accessToken}
-          handleLogOut={handleLogOut}
-          handleLogin={handleLogin}
           sheets={sheets}
-          setSheets={setSheets}
-          setOpen={setOpen}
-          handleGetSheetNm={handleGetSheetNm}
-          handleLeagueClick={handleLeagueClick}
+          sheetNm={sheetNm}
+          setSheetNm={setSheetNm}
+          handleGetSheets={handleGetSheets}
+          handleSelectSheet={handleSelectSheet}
+          handleSheetEdit={handleSheetEdit}
+          handleSheetNmSave={handleSheetNmSave}
+          handleSheetDelete={handleSheetDelete}
         />
-        <Round
-          accessToken={accessToken}
-          sheet={sheets.find((sheet) => sheet.active)}
-          rounds={rounds}
-          handleGetRound={handleGetRound}
-          handleRoundClick={handleRoundClick}
-          socket={socket}
-        />
-        <Table
-          accessToken={accessToken}
-          sheet={sheets.find((sheet) => sheet.active)}
-          round={rounds.find((round) => round.active)}
-          socket={socket}
-        />
+        {!sheetId && (
+          <Welcome>
+            <p>Welcome to Eternal Return League. </p>
+            <p>You can view or edit statistics for each competition.</p>
+          </Welcome>
+        )}
+        {sheetInfo && (
+          <>
+            {/* <Round
+              accessToken={accessToken}
+              sheetInfo={sheetInfo}
+              rounds={rounds}
+              handleGetRound={handleGetRound}
+              handleRoundClick={handleRoundClick}
+              socket={socket}
+            /> */}
+            {/* <Table
+              accessToken={accessToken}
+              sheet={sheets.find((sheet) => sheet.active)}
+              round={rounds.find((round) => round.active)}
+              socket={socket}
+            /> */}
+          </>
+        )}
       </Content>
-      <AddSheetModal
+      {/* <AddSheetModal
         open={open}
         setOpen={setOpen}
         sheets={sheets}
-        handleGetSheetNm={handleGetSheetNm}
-      />
+        handleGetSheetNm={handleGetSheets}
+      /> */}
     </Wrapper>
   );
 };

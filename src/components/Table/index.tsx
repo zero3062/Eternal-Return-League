@@ -4,7 +4,7 @@ import {
   getTeamData,
   getTotalData,
   updateCellFormula,
-} from '../../apis/spreadApi';
+} from '../../api/apis/spreadApi';
 import useRange from '../../hooks/useRange';
 import { RoundINF, SheetNmINF } from '../../types/types';
 import { Tbody, Tr, Wrapper } from './style';

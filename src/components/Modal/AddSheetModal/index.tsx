@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { duplicateSheet } from '../../../apis/spreadApi';
+import { duplicateSheet } from '../../../api/apis/spreadApi';
 import Modal from '../Modal';
 import {
   Button,

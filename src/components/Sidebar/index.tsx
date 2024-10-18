@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   CheckImg,
   Content,
@@ -12,75 +12,28 @@ import {
   Wrapper,
 } from './style';
 import { SheetNmINF } from '../../types/types';
-import { deleteSheet, updateSheetProperties } from '../../apis/spreadApi';
+import { SidebarINF } from '../../hooks/useSidbar';
 
 const Sidebar = ({
-  accessToken,
-  handleLogOut,
-  handleLogin,
   sheets,
-  setSheets,
-  setOpen,
-  handleGetSheetNm,
-  handleLeagueClick,
-}: {
-  accessToken: string;
-  handleLogOut: () => void;
-  handleLogin: () => void;
-  sheets: SheetNmINF[];
-  setSheets: React.Dispatch<React.SetStateAction<SheetNmINF[]>>;
-  setOpen: (open: boolean) => void;
-  handleGetSheetNm: (index: number) => void;
-  handleLeagueClick: (title: string) => void;
-}) => {
-  const [editTitle, setEditTitle] = useState('');
-
-  const activeSheetsIndex = sheets.findIndex((sheet) => sheet.active);
-
-  const handleEdit = async (
-    e: React.MouseEvent<HTMLImageElement, MouseEvent>,
-    title: string,
-  ) => {
-    e.stopPropagation();
-    setSheets((preSheets) =>
-      preSheets.map((item) => {
-        return { ...item, edit: item.title === title };
-      }),
-    );
-    setEditTitle(title);
-  };
-
-  const handleSave = async (
-    e: React.MouseEvent<HTMLImageElement, MouseEvent>,
-    id: number,
-  ) => {
-    e.stopPropagation();
-
-    await updateSheetProperties(id, editTitle);
-    await handleGetSheetNm(activeSheetsIndex);
-    setEditTitle('');
-  };
-
-  const handleDelete = async (
-    e: React.MouseEvent<HTMLImageElement, MouseEvent>,
-    id: number,
-  ) => {
-    e.stopPropagation();
-
-    await deleteSheet(id);
-    await handleGetSheetNm(activeSheetsIndex);
-  };
-
+  sheetNm,
+  setSheetNm,
+  handleSelectSheet,
+  handleSheetEdit,
+  handleSheetNmSave,
+  handleSheetDelete,
+}: SidebarINF) => {
   const handleImg = (sheet: SheetNmINF) => {
     const { id, active, edit } = sheet;
 
-    if (!accessToken) return null;
+    return null;
+    // if (!accessToken) return null;
     if (active) {
       if (edit) {
         return (
           <CheckImg
             src="./images/check.png"
-            onClick={(e) => handleSave(e, id)}
+            onClick={(e) => handleSheetNmSave(e, id)}
           />
         );
       }
@@ -88,7 +41,7 @@ const Sidebar = ({
       return (
         <EditImg
           src="./images/edit.png"
-          onClick={(e) => handleEdit(e, sheet.title)}
+          onClick={(e) => handleSheetEdit(e, sheet.title)}
         />
       );
     }
@@ -96,7 +49,7 @@ const Sidebar = ({
     return (
       <DeleteImg
         src="./images/delete.png"
-        onClick={(e) => handleDelete(e, sheet.id)}
+        onClick={(e) => handleSheetDelete(e, sheet.id)}
       />
     );
   };
@@ -105,23 +58,23 @@ const Sidebar = ({
     <Wrapper>
       <Content>
         <Header>
-          <p>League Name</p>
-          {accessToken && (
+          <p>Enternal Return Match Table</p>
+          {/* {accessToken && (
             <img src="./images/plus.png" onClick={() => setOpen(true)} />
-          )}
+          )} */}
         </Header>
         <ListWrapper>
           {sheets.slice(3).map((sheet) => (
             <List
-              onClick={() => handleLeagueClick(sheet.title)}
+              onClick={() => handleSelectSheet(sheet.id)}
               active={sheet.active}
             >
               <ListHeader>
                 {sheet.edit ? (
                   <input
-                    value={editTitle}
+                    value={sheetNm}
                     onClick={(e) => e.stopPropagation()}
-                    onChange={(e) => setEditTitle(e.target.value)}
+                    onChange={(e) => setSheetNm(e.target.value)}
                   />
                 ) : (
                   <p>{sheet.title}</p>
@@ -133,11 +86,11 @@ const Sidebar = ({
         </ListWrapper>
       </Content>
       <User>
-        {accessToken ? (
+        {/* {accessToken ? (
           <button onClick={handleLogOut}>Log out</button>
         ) : (
           <button onClick={handleLogin}>Login</button>
-        )}
+        )} */}
       </User>
     </Wrapper>
   );

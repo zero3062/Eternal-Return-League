@@ -1,9 +1,27 @@
-import { spreadsheetApi, spreadsheetApikey, spreadsheetDocId } from '../config';
+import {
+  spreadsheetApi,
+  spreadsheetApikey,
+  spreadsheetDocId,
+} from '../../config';
 import axios from 'axios';
-import { SheetsINF, TabColorINF } from '../types/spread';
-import { SheetNmINF } from '../types/types';
+import { SheetNmINF } from '../../types/types';
+import { deafultInstance } from '../axiosInstance';
 
 const accessToken = localStorage.getItem('access_token');
+
+// 시트 목록 가져오기 api
+export const getSheetsApi = async () => {
+  try {
+    const response = await deafultInstance({
+      url: '',
+      method: 'GET',
+    });
+
+    return response.data.sheets;
+  } catch (err) {
+    //
+  }
+};
 
 export const getRound = async (sheet: string) => {
   const url = `${spreadsheetApi}${spreadsheetDocId}/values/${sheet}!e2:az2?key=${spreadsheetApikey}`;
@@ -12,41 +30,6 @@ export const getRound = async (sheet: string) => {
     return response.data.values ?? [];
   } catch (error) {
     console.error('Error fetching data:', error);
-  }
-};
-
-const handleToHex = (tabColor: TabColorINF) => {
-  const { red, green, blue } = tabColor;
-  const to255 = (value: number) => Math.round(value * 255);
-
-  const toHex = (value: number) => {
-    const hex = value.toString(16);
-    return hex.length === 1 ? '0' + hex : hex;
-  };
-
-  const r = toHex(to255(red));
-  const g = toHex(to255(green));
-  const b = toHex(to255(blue));
-
-  return `#${r}${g}${b}`;
-};
-
-export const fetchSheetNm = async () => {
-  const url = `${spreadsheetApi}${spreadsheetDocId}?key=${spreadsheetApikey}`;
-  try {
-    const response = await axios.get(url);
-    const sheetNames = response.data.sheets.map((sheet: SheetsINF) => {
-      return {
-        id: sheet.properties.sheetId,
-        title: sheet.properties.title,
-        edit: false,
-        active: false,
-        isRoundAdd: handleToHex(sheet.properties.tabColor) === '#d9ead3',
-      };
-    });
-    return sheetNames;
-  } catch (error) {
-    console.error('Error fetching sheet names:', error);
   }
 };
 
